@@ -168,6 +168,9 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+
+        Slides\Saml2\ServiceProvider::class,
+
     ])->toArray(),
 
     /*
@@ -182,7 +185,7 @@ return [
     */
 
     'aliases' => Facade::defaultAliases()->merge([
-        // 'Example' => App\Facades\Example::class,
+        'Saml2' => Slides\Saml2\Facades\Auth::class,
     ])->toArray(),
 
 ];

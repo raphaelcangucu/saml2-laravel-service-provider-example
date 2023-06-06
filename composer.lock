@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ed58100c318673821e77e306a0ab3f52",
+    "content-hash": "fe68d3c8755c506e01feb09dd32275a5",
     "packages": [
         {
             "name": "24slides/laravel-saml2",
-            "version": "2.2.0",
+            "version": "dev-fixSailPort",
             "source": {
                 "type": "git",
-                "url": "https://github.com/24Slides/laravel-saml2.git",
-                "reference": "dbac551c654eb37a27903fb8c8e44bc73749cfa4"
+                "url": "https://github.com/raphaelcangucu/laravel-saml2.git",
+                "reference": "f0037575cfc75f0e41a9830044d21fd5bf5a3fa7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/24Slides/laravel-saml2/zipball/dbac551c654eb37a27903fb8c8e44bc73749cfa4",
-                "reference": "dbac551c654eb37a27903fb8c8e44bc73749cfa4",
+                "url": "https://api.github.com/repos/raphaelcangucu/laravel-saml2/zipball/f0037575cfc75f0e41a9830044d21fd5bf5a3fa7",
+                "reference": "f0037575cfc75f0e41a9830044d21fd5bf5a3fa7",
                 "shasum": ""
             },
             "require": {
@@ -49,14 +49,13 @@
                 }
             },
             "autoload": {
-                "files": [
-                    "src/helpers.php"
-                ],
                 "psr-4": {
                     "Slides\\Saml2\\": "src/"
-                }
+                },
+                "files": [
+                    "src/helpers.php"
+                ]
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -69,17 +68,16 @@
             "description": "SAML2 Service Provider integration to your Laravel 5.4+ application, based on OneLogin toolkit",
             "homepage": "https://github.com/24slides/laravel-saml2",
             "keywords": [
-                "SAML2",
-                "SSO",
                 "laravel",
                 "onelogin",
-                "saml"
+                "saml",
+                "saml2",
+                "sso"
             ],
             "support": {
-                "issues": "https://github.com/24Slides/laravel-saml2/issues",
-                "source": "https://github.com/24Slides/laravel-saml2/tree/2.2.0"
+                "source": "https://github.com/raphaelcangucu/laravel-saml2/tree/fixSailPort"
             },
-            "time": "2023-02-20T20:21:13+00:00"
+            "time": "2023-06-06T22:09:41+00:00"
         },
         {
             "name": "brick/math",
@@ -8107,7 +8105,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "24slides/laravel-saml2": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
