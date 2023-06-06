@@ -1,66 +1,109 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## About this Repo
 
-## About Laravel
+This repo is a demo repository to show how to use a SAML2 Service provider using the lib `24slides/laravel-saml2` in a Laravel Application.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+We need to change just a small thing at the library to make it work on the SAIL Laravel environment.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Steps to reproduce this demo
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Step 1. Install dependencies
 
-## Learning Laravel
+In composer.json file add the repository
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/raphaelcangucu/laravel-saml2.git"
+        }
+    ]
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Add the package using composer
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+    composer require 24slides/laravel-saml2:dev-fixSailPort
 
-## Laravel Sponsors
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+If you are using Laravel 5.5 and higher, the service provider will be automatically registered.
 
-### Premium Partners
+For older versions, you have to add the service provider and alias to your `config/app.php`:
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+```php
+'providers' => [
+    ...
+    Slides\Saml2\ServiceProvider::class,
+]
 
-## Contributing
+'alias' => [
+    ...
+    'Saml2' => Slides\Saml2\Facades\Auth::class,
+]
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-## Code of Conduct
+### Step 2. Publish the configuration file.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```
+php artisan vendor:publish --provider="Slides\Saml2\ServiceProvider"
+```
 
-## Security Vulnerabilities
+### Step 3. Run migrations
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```
+php artisan migrate
+```
 
-## License
+### Step 4. Configuring a new tenant -  Identity Providers (IdPs)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+To distinguish between identity providers there is an entity called Tenant that represent each IdP.
+
+When request comes to an application, the middleware parses UUID and resolves the Tenant.
+
+You can easily manage tenants using the following console commands:
+
+- `artisan saml2:create-tenant`
+- `artisan saml2:update-tenant`
+- `artisan saml2:delete-tenant`
+- `artisan saml2:restore-tenant`
+- `artisan saml2:list-tenants`
+- `artisan saml2:tenant-credentials`
+
+> To learn their options, run a command with `-h` parameter.
+
+Each Tenant has the following attributes:
+
+- **UUID** — a unique identifier that allows to resolve a tenannt and configure SP correspondingly
+- **Key** — a custom key to use for application needs
+- **Entity ID** — [Identity Provider Entity ID](https://spaces.at.internet2.edu/display/InCFederation/Entity+IDs)
+- **Login URL** — Identity Provider Single Sign On URL
+- **Logout URL** — Identity Provider Logout URL
+- **x509 certificate** — The certificate provided by Identity Provider in **base64** format
+- **Metadata** — Custom parameters for your application needs
+
+##### Step 4.1 Example for a local IDP
+
+```bash
+    sail artisan saml2:create-tenant --entityId=http://localhost/saml/metadata --loginUrl=http://localhost/auth/login --logoutUrl=http://localhost/auth/logout -x509cert=ASKFORTHEIDPCERTIFICATE
+
+```
+
+
+##### Step 4.2  See the IDP / Tenant credentials
+
+```bash
+    sail artisan saml2:tenant-credentials 1
+```
+
+It will return something like this
+
+    Identifier (Entity ID): http://localhost:8888/saml2/5d32bb4a-88fb-4d0b-890d-a785f3c64162/metadata
+    Reply URL (Assertion Consumer Service URL): http://localhost:8888/saml2/5d32bb4a-88fb-4d0b-890d-a785f3c64162/acs
+    Sign on URL: http://localhost:8888/saml2/5d32bb4a-88fb-4d0b-890d-a785f3c64162/login
+    Logout URL: http://localhost:8888/saml2/5d32bb4a-88fb-4d0b-890d-a785f3c64162/logout
+    Relay State:  (optional)
+
+#### Step 5. Testing the SAML2 Login
+
+    Open this a URL like this: `http://localhost:8888/saml2/5d32bb4a-88fb-4d0b-890d-a785f3c64162/login?returnTo=https://communitysite.dev.com`
+
+    This will redirect to the IDP and after the user Login it will return to the returnTo query param.
